@@ -1,8 +1,7 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AddMovie() {
   const initialValues = {
@@ -37,16 +36,18 @@ function AddMovie() {
       }
     });
 
-    axios
-      .post("http://localhost:8080/movies", formData, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        if (res.data.error) {
-          
-          alert(res.data.error);
+    fetch("http://localhost:8080/movies", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accessToken: localStorage.getItem("accessToken"),
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
         } else {
           navigate("/");
         }

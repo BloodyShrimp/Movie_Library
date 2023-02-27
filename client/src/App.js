@@ -6,8 +6,6 @@ import EditMovie from "./pages/EditMovie";
 import Login from "./pages/Login";
 import { AuthContext } from "./helpers/AuthContext";
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Profile from "./pages/Profile";
 
 function App() {
@@ -18,24 +16,24 @@ function App() {
   });
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/users/auth", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        if (res.data.error) {
+    fetch("http://localhost:8080/users/auth", {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
           setAuthState({ ...authState, status: false });
         } else {
           setAuthState({
-            username: res.data.username,
-            id: res.data.userId,
+            username: data.username,
+            id: data.userId,
             status: true,
           });
         }
       });
-  }, []);
+  }, [authState]);
 
   const logout = () => {
     localStorage.removeItem("accessToken");

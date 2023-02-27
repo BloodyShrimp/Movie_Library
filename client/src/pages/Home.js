@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
@@ -12,29 +11,31 @@ function Home() {
   const { authState } = useContext(AuthContext);
 
   const getMovies = (userId, status = "") => {
-    axios
-      .get(`http://localhost:8080/movies/private/${userId}/?status=${status}`, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        setListOfMovies(res.data);
+    const accessToken = localStorage.getItem("accessToken");
+
+    fetch(`http://localhost:8080/movies/private/${userId}/?status=${status}`, {
+      headers: {
+        accessToken,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setListOfMovies(data);
       });
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/users/auth", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        if (res.data.error) {
+    fetch("http://localhost:8080/users/auth", {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
           navigate("/login");
         } else {
-          getMovies(res.data.userId, selectedStatus);
+          getMovies(data.userId, selectedStatus);
         }
       });
   }, [authState.status, navigate, selectedStatus]);

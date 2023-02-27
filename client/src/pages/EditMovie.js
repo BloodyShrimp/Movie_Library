@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
@@ -18,27 +17,6 @@ function EditMovie() {
 
   let { id } = useParams();
   const navigate = useNavigate();
-  // const [movieObject, setMovieObject] = useState({});
-
-  // get movie by id
-  const getMovieData = () => {
-    axios.get(`http://localhost:8080/movies/byId/${id}`).then((res) => {
-      if (res.data) {
-        setInitialValues({
-          title: res.data.title || "",
-          score: res.data.score || "",
-          type: res.data.type || "",
-          episode: res.data.episode || "",
-          season: res.data.season || "",
-          startedDate: res.data.startedDate || "",
-          finishedDate: res.data.finishedDate || "",
-          status: res.data.status || "",
-        });
-      } else {
-        navigate("/");
-      }
-    });
-  };
 
   const onSubmitEdit = (data) => {
     const formData = {};
@@ -48,16 +26,19 @@ function EditMovie() {
         formData[key] = data[key];
       }
     });
-    
-    axios
-      .patch(`http://localhost:8080/movies/${id}`, formData, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        if (res.data.error) {
-          alert(res.data.error);
+
+    fetch(`http://localhost:8080/movies/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        accessToken: localStorage.getItem("accessToken"),
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
         } else {
           navigate("/");
         }
@@ -66,15 +47,16 @@ function EditMovie() {
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this entry?")) {
-      axios
-        .delete(`http://localhost:8080/movies/${id}`, {
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        })
-        .then((res) => {
-          if (res.data.error) {
-            alert(res.data.error);
+      fetch(`http://localhost:8080/movies/${id}`, {
+        method: "DELETE",
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            alert(data.error);
           } else {
             navigate("/");
           }
@@ -93,8 +75,32 @@ function EditMovie() {
   });
 
   useEffect(() => {
+    // get movie by id
+    const getMovieData = () => {
+      fetch(`http://localhost:8080/movies/byId/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data) {
+            setInitialValues({
+              title: data.title || "",
+              score: data.score || "",
+              type: data.type || "",
+              episode: data.episode || "",
+              season: data.season || "",
+              startedDate: data.startedDate || "",
+              finishedDate: data.finishedDate || "",
+              status: data.status || "",
+            });
+          } else {
+            navigate("/");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
     getMovieData();
-  }, []);
+  }, [id, navigate]);
 
   return (
     <div className="addMoviePage">

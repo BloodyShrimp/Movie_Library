@@ -1,7 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
 
@@ -46,27 +45,41 @@ function Login() {
   });
 
   const onSubmitLogin = (data) => {
-    axios.post("http://localhost:8080/users/login", data).then((res) => {
-      if (res.data.error) {
-        alert(res.data.error);
-      } else {
-        localStorage.setItem("accessToken", res.data.token);
-        setAuthState({
-          username: res.data.username,
-          id: res.data.userId,
-          status: true,
-        });
-        navigate("/");
-      }
-    });
+    fetch("http://localhost:8080/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          localStorage.setItem("accessToken", data.token);
+          setAuthState({
+            username: data.username,
+            id: data.userId,
+            status: true,
+          });
+          navigate("/");
+        }
+      });
   };
 
   const onSubmitRegister = (data, args) => {
-    axios.post("http://localhost:8080/users", data).then((res) => {
+    fetch("http://localhost:8080/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then(() => {
       args.resetForm();
     });
   };
-
+  
   return (
     <div className="LoginRegisterPage">
       <div className="LoginField">

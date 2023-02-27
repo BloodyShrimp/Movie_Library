@@ -1,8 +1,7 @@
 import React, { useContext, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AuthContext } from "../helpers/AuthContext";
-import axios from "axios";
 
 function Profile() {
   const [userInfo, setUserInfo] = useState({
@@ -10,44 +9,50 @@ function Profile() {
     email: "",
     id: 0,
   });
+
+  const [createdAtState, setCreatedAtState] = useState("");
   let navigate = useNavigate();
   const { authState, setAuthState } = useContext(AuthContext);
 
-  const getUserData = (id) => {
-    axios.get(`http://localhost:8080/users/${id}`).then((res) => {
-      if (res.data) {
-        setUserInfo(res.data);
-      } else {
-        navigate("/");
-      }
-    });
-  };
-
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/users/auth", {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((res) => {
-        if (res.data.error) {
+    const getUserData = (id) => {
+      fetch(`http://localhost:8080/users/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data) {
+            setUserInfo(data);
+            setCreatedAtState(data.createdAt.slice(0, 10));
+          } else {
+            navigate("/");
+          }
+        });
+    };
+
+    fetch("http://localhost:8080/users/auth", {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
           navigate("/");
         } else {
-          getUserData(res.data.userId);
+          getUserData(data.userId);
         }
       });
   }, [authState, navigate]);
 
   const deleteAccount = () => {
     if (window.confirm("Are you sure you want to delete this account?")) {
-      axios
-        .delete(`http://localhost:8080/users/${userInfo.id}`, {
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-        })
-        .then((res) => {
+      fetch(`http://localhost:8080/users/${userInfo.id}`, {
+        method: "DELETE",
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
           localStorage.removeItem("accessToken");
           setAuthState({
             username: "",
@@ -64,7 +69,7 @@ function Profile() {
       <div className="basicInfo">
         <h1>Username: {userInfo.username}</h1>
         <h1>Email: {userInfo.email}</h1>
-        <h1>Account creation: {userInfo.createdAt}</h1>
+        <h1>Account creation: {createdAtState}</h1>
       </div>
       <div className="deleteAccount">
         <button onClick={deleteAccount}>Delete Account</button>
