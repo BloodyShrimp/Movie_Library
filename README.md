@@ -1,4 +1,4 @@
-# Techiniki_WWW_dynamic
+# Full Stack React and Node.js site
 
 - Dynamic movie library site built with Node.js and React.
 - Back-end server with API calls and connection to a MySQL databse
