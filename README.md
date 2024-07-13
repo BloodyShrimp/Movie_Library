@@ -108,3 +108,4 @@ React.js server will be enabled under the address `localhost:3000`.
 ![Library](https://github.com/BloodyShrimp/Movie_Library/assets/67617288/b07b947f-ebaf-4f63-8def-85bacaa3a1cd)
 ![Login](https://github.com/BloodyShrimp/Movie_Library/assets/67617288/45d577b5-8d71-4a31-bb20-00a1a8a36443)
 ![User](https://github.com/BloodyShrimp/Movie_Library/assets/67617288/041d5b25-98eb-4bbd-a830-efea1ed566c1)
+![WWW_2024 drawio](https://github.com/user-attachments/assets/6f4f9052-b64e-4205-bffb-f0c2d237319d)
