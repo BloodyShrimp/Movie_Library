@@ -10,8 +10,6 @@
 - Passwords hashed securely and stored in the database
 - JSON Web Token authorization
 
-https://www.figma.com/design/j3tZNHuzfqCrW3xL1LS9lm/WWW_2024?node-id=0-1&t=ltGh4HCDjQASuJFR-1
-
 ----------
 <br>
 
